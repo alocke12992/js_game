@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Best Other Game Ever</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas></canvas>
+  <script>
+    "use strict";
+
+    const canvas = document.querySelector("canvas");
+    const context = canvas.getContext("2d");
+
+    const player = {
+      x: 0,
+      y: 0,
+      size: 10,
+      color: "green",
+      speed: 2,
+    };
+
+    let dots = [];
+
+    for (let i = 0; i < 100; i++) {
+      const poisonous = Math.random() > .5;
+      dots.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: 5,
+        alive: true,
+        color: poisonous ? "rgba(189,103,107,1)" : "rgba(0,200,100,1)",
+        poisonous,
+      });
+    }
+
+    const keys = {};
+
+    const update = () => {
+      // update
+      if (keys.ArrowRight) {
+        player.x += player.speed;
+      }
+      if (keys.ArrowLeft) {
+        player.x -= player.speed;
+      }
+      if (keys.ArrowUp) {
+        player.y -= player.speed;
+      }
+      if (keys.ArrowDown) {
+        player.y += player.speed;
+      }
+
+      // check collision
+      dots.forEach(dot => {
+        if (Math.abs(dot.x - player.x) < player.size
+          && Math.abs(dot.y - player.y) < player.size
+        ) {
+          dot.alive = false;
+          player.size += dot.poisonous ? -2 : .1;
+        }
+      });
+
+      dots = dots.filter(d => d.alive);
+
+      // render
+      // clear screen
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      // render stuff
+      [...dots, player].forEach(thing => {
+        context.fillStyle = thing.color;
+        context.fillRect(thing.x, thing.y, thing.size, thing.size);
+      });
+
+      window.requestAnimationFrame(update);
+    };
+    window.requestAnimationFrame(update);
+
+    window.addEventListener("keydown", event => {
+      keys[event.key] = true;
+    });
+    window.addEventListener("keyup", event => {
+      keys[event.key] = false;
+    });
+  </script>
+</body>
+
+</html>
